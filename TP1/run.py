@@ -24,6 +24,8 @@ Output
 
 Exemplo:
     15 14
+
+Ref: https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/components.html
 """
 
 class Node(object):
@@ -42,7 +44,7 @@ class Node(object):
 
 class Related_Components(object):
 
-    def UGRAPHcc(self, graph, cc):
+    def UGRAPHcc(https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/components.htmlself, graph, cc):
         self.vertex = []
         self.id = 0
         index = 0
