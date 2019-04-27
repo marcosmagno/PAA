@@ -39,110 +39,86 @@ class Node(object):
             self.adjacency_list[v] = []    
         self.adjacency_list[u].append(v)        
         self.adjacency_list[v].append(u)
-        
+
+
     def get_adjacency_list(self):
         return self.adjacency_list
 
 
 class Related_Components(object):
-
     def UGRAPHcc(self, graph, cc):
         self.vertex = []
         self.id = 0
         index = 0
         self.indexAdja = 0
-
+        
         """ TODO: improve this"""
-        for k,v in graph.items():
-            if k not in self.vertex:
-                self.vertex.append(k)
-            for i in v:
-                if i not in self.vertex:
-                    self.vertex.append(i)
+        #for k,v in graph.items():
+        #    if k not in self.vertex:
+        #        self.vertex.append(k)
+        #    for i in v:
+        #        if i not in self.vertex:
+        #            self.vertex.append(i)
+        
 
-
-        for v in self.vertex:
+        for v in range(1, 100001): # M + 1
             cc.append(-1)
 
-        for v in self.vertex:
+        for v in range(1, 100001): # M + 1
             try:
                 if(cc[v-1] == -1):
                     self.id = self.id +1
                     """ call dfsRcc """
-                    print("enviando vertice", v)
                     self.dfsRcc(graph, cc, v, self.id)
             except IndexError as identifier:
                 pass
+        print(cc)
         return self.id
             
 
     def dfsRcc(self,graph, cc, v, id):
-        print("dfsRcc", v)
-        #time.sleep(1)
         cc[v-1] = id
-        print(cc)
         try:
             for a in graph[v]:
-                print("adja", a)
                 if(cc[a-1] == -1):
                     self.dfsRcc(graph, cc, a, id)
-                    print(cc)
-
         except KeyError as identifier:
             pass
-            
+
+class Input(object):
+
+    def read_file(self, file_name):
+        """ Entrada
+            10 <= N <= 1000000  Numero de posto de combate
+            9  <= M <= 10000000 Quantidade de teleportes
+            M linhas : teleportes possíveis
+                1 <= a <= N
+                1 <= b <= N
+
+            N linhas : O tripulante c deve retornar para o posto correto d
+                1 <= c <= N
+                1 <= d <= N
+        """
+        get_file = open(file_name,"r")
+        return get_file
+
 def main():
+    """ TODO improve variavel name"""
     node = Node()
     components = Related_Components()
+    file_ = Input()
     vector = [] 
-    """ exemplo 1 """
-    node.set_adjacency_list(1,2)
-    node.set_adjacency_list(1,3)
-    node.set_adjacency_list(1,4)
-    node.set_adjacency_list(4,5)
-    node.set_adjacency_list(6,8)
-    node.set_adjacency_list(6,9)
-    node.set_adjacency_list(6,10)
-    node.set_adjacency_list(7,8)
-    node.set_adjacency_list(7,9)
-    node.set_adjacency_list(7,10)
-    node.set_adjacency_list(11,12)
-    node.set_adjacency_list(12,13)
-    node.set_adjacency_list(13,14)
-    node.set_adjacency_list(14,15)
-    node.set_adjacency_list(16,17)
-    node.set_adjacency_list(17,18)
-    node.set_adjacency_list(18,19)
-    node.set_adjacency_list(20,20)
-    node.set_adjacency_list(21,22)
-    node.set_adjacency_list(21,23)
-    node.set_adjacency_list(23,22)
-    
-    """ exemplo 2 """
-    """
-    node.set_adjacency_list(1,8)
-    node.set_adjacency_list(8,7)
-    node.set_adjacency_list(7,6)
-    node.set_adjacency_list(6,5)
-    node.set_adjacency_list(5,4)
-    node.set_adjacency_list(4,3)
-    node.set_adjacency_list(3,2)
-    node.set_adjacency_list(2,1)
-    node.set_adjacency_list(9,10)
-    node.set_adjacency_list(10,11)
-    node.set_adjacency_list(11,12)
-    node.set_adjacency_list(12,13)
-    node.set_adjacency_list(13,14)
-    node.set_adjacency_list(14,9)
-    node.set_adjacency_list(15,16)
-    node.set_adjacency_list(16,17)
-    node.set_adjacency_list(17,18)
-    node.set_adjacency_list(18,19)
-    """
-    print(node.get_adjacency_list())
-    print(components.UGRAPHcc(node.get_adjacency_list(), vector))
-
-   # print(node.get_node())
+    obj_file = file_.read_file("tests/in/10.in")
+    first_line = obj_file.readline()
+    qt_teleportes = first_line.split(" ")[1]
+    qt_local_tripulante = first_line.split(" ")[0]
+    for i in range(0, int(qt_teleportes)):
+        var = obj_file.readline()
+        node.set_adjacency_list(int(var.split(" ")[0]), int(var.split(" ")[1]))
+    qt_Components = components.UGRAPHcc(node.get_adjacency_list(), vector)
+    print(qt_Components)
+    #print(vector)
+   
     
     
 
