@@ -46,25 +46,19 @@ class Node(object):
 
 
 class Related_Components(object):
+    
+    def __init__(self, qt_vertex):
+        self.qt_vertex = qt_vertex
+
     def UGRAPHcc(self, graph, cc):
         self.vertex = []
         self.id = 0
-        index = 0
         self.indexAdja = 0
-        
-        """ TODO: improve this"""
-        #for k,v in graph.items():
-        #    if k not in self.vertex:
-        #        self.vertex.append(k)
-        #    for i in v:
-        #        if i not in self.vertex:
-        #            self.vertex.append(i)
-        
 
-        for v in range(1, 100001): # M + 1
+        for v in range(1, self.qt_vertex + 1): # M + 1
             cc.append(-1)
 
-        for v in range(1, 100001): # M + 1
+        for v in range(1, self.qt_vertex + 1): # M + 1
             try:
                 if(cc[v-1] == -1):
                     self.id = self.id +1
@@ -72,7 +66,6 @@ class Related_Components(object):
                     self.dfsRcc(graph, cc, v, self.id)
             except IndexError as identifier:
                 pass
-        print(cc)
         return self.id
             
 
@@ -104,19 +97,33 @@ class Input(object):
 
 def main():
     """ TODO improve variavel name"""
-    node = Node()
-    components = Related_Components()
     file_ = Input()
-    vector = [] 
-    obj_file = file_.read_file("tests/in/10.in")
+    obj_file = file_.read_file("tests/in/9.in")
     first_line = obj_file.readline()
     qt_teleportes = first_line.split(" ")[1]
     qt_local_tripulante = first_line.split(" ")[0]
+    node = Node()
+    components = Related_Components(int(qt_local_tripulante))
+    vector = [] 
+    
     for i in range(0, int(qt_teleportes)):
         var = obj_file.readline()
         node.set_adjacency_list(int(var.split(" ")[0]), int(var.split(" ")[1]))
     qt_Components = components.UGRAPHcc(node.get_adjacency_list(), vector)
     print(qt_Components)
+    c = 0
+    for i in range(1, qt_Components + 1):
+        for j in vector:
+            if i == j:
+                c = c + 1
+                print(c, node.get_adjacency_list()[c])
+                
+                # TODO reconhecer tipo de nave aqui
+
+        print("---------------------")
+    #print("Lista de adj", "\n")
+    #print(node.get_adjacency_list())
+    #print("Vector")
     #print(vector)
    
     
