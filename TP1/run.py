@@ -1,4 +1,5 @@
 import time
+import sys
 """
 Input
     Multiplas navaes de maneira conjunta
@@ -51,32 +52,89 @@ class Related_Components(object):
         self.qt_vertex = qt_vertex
 
     def UGRAPHcc(self, graph, cc):
-        self.vertex = []
         self.id = 0
         self.indexAdja = 0
-
+        self.Transportadores = 0
+        self.Reconhecimento = 0
         for v in range(1, self.qt_vertex + 1): # M + 1
             cc.append(-1)
 
         for v in range(1, self.qt_vertex + 1): # M + 1
             try:
                 if(cc[v-1] == -1):
-                    self.id = self.id +1
+                    self.id = self.id +1                    
                     """ call dfsRcc """
-                    self.dfsRcc(graph, cc, v, self.id)
+                    self.singleGraph = {}
+                    color = []
+                    returnDfs = self.dfsRcc(graph, cc, v, self.id)
+                    qt_transportadores = self.check_Transportadores(returnDfs)
+                    print("qt_ transportadores", qt_transportadores)
+                    newg = returnDfs.copy()
+                    self.UGRAPHtwoColor(newg, color)
             except IndexError as identifier:
                 pass
         return self.id
-            
 
     def dfsRcc(self,graph, cc, v, id):
         cc[v-1] = id
+        self.singleGraph[v] = []
+        self.singleGraph[v] = graph[v]
         try:
             for a in graph[v]:
                 if(cc[a-1] == -1):
                     self.dfsRcc(graph, cc, a, id)
         except KeyError as identifier:
             pass
+        
+        return self.singleGraph
+        
+    def check_Transportadores(self, graph):
+        grau = []
+        for k, v in graph.items():
+            grau.append(len(v))
+        if (all(s == 2 for s in grau)):
+            self.Transportadores = self.Transportadores + 1  
+        
+        
+        if grau[0] == 1 and grau[-1] == 1:
+            del grau[0]
+            del grau[-1]
+            #print("Depois",grau)
+            if (all(s == 2 for s in grau)):
+                self.Reconhecimento = self.Reconhecimento + 1
+        
+        return str(self.Transportadores) + " - " + str(self.Reconhecimento)
+
+    def UGRAPHtwoColor(self, graph, color):
+        for i in range(1, len(graph) + 1):
+            color.append(-1)
+
+        for v in range(1, len(graph) + 1):
+            if color[v - 1] == -1:
+                if (self.dfsRcolor(graph, v, color, 0) == False):
+                    return False
+                else:
+                    return True
+
+    def dfsRcolor(self, graph, v, color, c):
+        color[v - 1] = c 
+        i = v - 1
+        print("VERTICE", v)
+        print("COLOR", color)
+        print("GRAPH", graph)
+        for a in graph.values():
+            
+            w = a[i]
+            i + 1 
+            print("VARIAVEL A", a)
+            print("VARIAVEL W", w)
+            if(color[w - 1] == -1):
+                print("CHAMOU REC DFS")
+                self.dfsRcolor(graph, w, color, 1-c)
+            elif(color[w] == c):
+                return False
+        return True
+        
 
 class Input(object):
 
@@ -98,68 +156,20 @@ class Input(object):
 def main():
     """ TODO improve variavel name"""
     file_ = Input()
-    obj_file = file_.read_file("tests/in/9.in")
+    file_recv = sys.argv[1]
+    obj_file = file_.read_file(str(file_recv))
     first_line = obj_file.readline()
     qt_teleportes = first_line.split(" ")[1]
     qt_local_tripulante = first_line.split(" ")[0]
     node = Node()
     components = Related_Components(int(qt_local_tripulante))
-    vector = [] 
+    vector = []
     
     for i in range(0, int(qt_teleportes)):
         var = obj_file.readline()
         node.set_adjacency_list(int(var.split(" ")[0]), int(var.split(" ")[1]))
     qt_Components = components.UGRAPHcc(node.get_adjacency_list(), vector)
     print(qt_Components)
-    c = 0
-    for i in range(1, qt_Components + 1):
-        for j in vector:
-            if i == j:
-                c = c + 1
-                print(c, node.get_adjacency_list()[c])
-                
-                # TODO reconhecer tipo de nave aqui
-
-        print("---------------------")
-    #print("Lista de adj", "\n")
-    #print(node.get_adjacency_list())
-    #print("Vector")
-    #print(vector)
-   
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     main()
