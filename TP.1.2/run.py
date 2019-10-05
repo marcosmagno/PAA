@@ -1,5 +1,6 @@
 import time
 import sys
+import copy
 """
 Input
     n,m - Dimensão do container
@@ -66,13 +67,11 @@ def main():
     #for p in permutacao([1,2,3,4]):
         i = i + 1
         dic_permutacao[i] = list(p)
-
     #create_Graph(dic_permutacao, 2, 2)
     create_Graph(dic_permutacao, 3, 3)
 
 #n linhas m colunas
 def create_Graph(p, l, c):
-
     tmp = []
     matriz = []
     matrizResultante = []
@@ -81,31 +80,49 @@ def create_Graph(p, l, c):
         n = l
         matriz = []
         len_l = len(v)
-        print(k,v)
         for i in range(n):
             start = int(i*len_l/n)
             end = int((i+1)*len_l/n)
             matriz.append(v[start:end])
-        print(matriz)
+        print("\n\n\n\n")
+        print("Vetor Inicial", k, v)
+        # permutacoes
         
-        print("\n\n")
-        #print(matriz)
-        #print([matriz[i][i] for i in range(0, len(matriz))], "\n") # 2 1 2
-        #print("init v", v)
-        print("linha", l, "coluna", c)
         for i in range(0,l):
             for j in range(0,c-1):
-                print(matriz[i][j])
-                print(matriz[i][j+1])
-        print("\n")
+                
+                matrizResultante = [lst[:] for lst in matriz] #copy.deepcopy(matriz)
+                #print(matriz[i][j])
+                #print(matriz[i][j+1])
+                aux = matriz[i][j] # 1
+                matrizResultante[i][j] = matriz[i][j+1] #2
+                matrizResultante[i][j+1] = aux
+                print("Matriz Inicial Horizontal: ", matriz)
+                espande_Permutacao(matrizResultante)
+
+                #print("matriz Trocada", matrizResultante)
+
+        #print("\n")
         for i in range(0,l-1):
             for j in range(0,c):
-                print(matriz[i][j])
-                print(matriz[i+1][j])
-
-
-        matrizResultante = []
+                matrizResultante = [lst[:] for lst in matriz] #copy.deepcopy(matriz)
+                aux = matriz[i][j] # 1
+                matrizResultante[i][j] = matriz[i+1][j] #3
+                matrizResultante[i+1][j] = aux
+                print("Matriz Inicial Vertical: ", matriz)
+                espande_Permutacao(matrizResultante)
+                                
         
+        
+
+
+def espande_Permutacao(matrizResultante):
+    
+    print("matriz Trocada", matrizResultante)
+    time.sleep(2)
+
+    
+
 def permutacao(matrizAtual, c=0):
     if c + 1 >= len(matrizAtual):
         #print("Matriz Atual", matrizAtual, c)
