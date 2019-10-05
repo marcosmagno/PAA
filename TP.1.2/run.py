@@ -48,19 +48,23 @@ def main():
     file_recv = sys.argv[1]
     obj_file = file_.read_file(str(file_recv))
     first_line = obj_file.readlines()
+    
     linhas = first_line[0].split(" ")[0]
     colunas = first_line[0].split(" ")[1]
     pesos = first_line[1]
+    
+
+    for i in range(2, len(first_line)):
+        print(first_line[i])
     i = 0
     dic_permutacao = {}
-    
     #for p in permutacao([1,2,3,4,5,6,7,8,9]):
     #for p in permutacao([1,2,3,4,5,6,7,8]):
     for p in permutacao([1,2,3,4]):
         i = i + 1
         dic_permutacao[str(p)] = i
+    #create_Graph(dic_permutacao, linhas, colunas)
     create_Graph(dic_permutacao, 2, 2)
-   
     #create_Graph(dic_permutacao, 3, 3)
     #create_Graph(dic_permutacao, 4, 2)
 
