@@ -2,6 +2,7 @@ import time
 import sys
 import copy
 import heapq
+import timeit
 """
 Input
     n,m - Dimensão do container
@@ -25,17 +26,13 @@ class Graph(object):
         """ 
             Cria lista de Adjacencia
         """
-        print(u, v)
         if v not in self.graph:
             self.graph[v] = {}
-        self.graph[v][u] = w
-  
+        else: 
+            self.graph[v][u] = w
         
     def get_graph(self):
         return self.graph
-
-
-
 
 class Input(object):
     def read_file(self, file_name):
@@ -52,58 +49,55 @@ def main():
     pesos = first_line[1]
     rPeso = pesos.replace("\n","")
     allPesos = rPeso.split(" ")
-    vectorPesos = []
+    matrizInicial = []
+
+    
     for i in range(2, len(first_line)):
         index = first_line[i].replace("\n","").split(" ")
+        
         rIndex = list(map(int, index))
         for j in rIndex:
-            vectorPesos.append(allPesos[j-1])
-    lenLinhaColuna = int(linhas) * int(colunas)
+            matrizInicial.append(j)
 
-    resulIntVector = list(map(int, vectorPesos))
-    matrizInicial = resulIntVector[0:lenLinhaColuna]
-    matrizFinal = resulIntVector[lenLinhaColuna:len(resulIntVector)]
-    time.sleep(2)
-    i = 1
+
+    lenLinhaColuna = int(linhas) * int(colunas)
+    vectorPesos = list(map(int, allPesos))
+    resultMatrizInicial = list(map(int, matrizInicial))
+    matrizInicial = resultMatrizInicial[0:lenLinhaColuna]
+    matrizFinal = resultMatrizInicial[lenLinhaColuna:len(resultMatrizInicial)]
+    i = 0
     dic_permutacao = {}
     for p in permutacao(matrizInicial):
-        dic_permutacao[str(p)] = int(i)
         i = i + 1
-    create_Graph(dic_permutacao, int(linhas), int(colunas), matrizInicial, matrizFinal)
-
-
-def create_Graph(permutations, l, c, matrizInicial, matrizFinal):
+        dic_permutacao[str(p)] = int(i)
+    
+    create_Graph(dic_permutacao, int(linhas), int(colunas), matrizInicial, matrizFinal, vectorPesos)
+    end = timeit.timeit()
+    
+def create_Graph(permutations, l, c, matrizInicial, matrizFinal, vectorPesos):
     matriz = []
     matrizResultante = []
     graph = Graph()
+    idMatrizFinal = permutations.get(str(matrizFinal))
     
     for k, v in permutations.items():
-        n = l
+        
+        #n = l
         r = k.replace("[","")
         r = r.replace("]","")
         resultList = list(map(int, r.split(",")))
         matriz = [resultList[i:i+int(c)] for i in range(0, len(resultList), int(c))]
-        #matriz = [[1,2,3],[3,4,6],[7,8,9]]
-        #len_l = len(v)
-        #for i in range(n):
-        #    start = int(i*len_l/n)
-        #    end = int((i+1)*len_l/n)
-        #    matriz.append(v[start:end])
-        # permutacoes
         for i in range(0,l):
             for j in range(0,c-1):
-                #print(matriz[i][j+1])
-                #aux = matriz[i][j] # 1
-                #matrizResultante[i][j] = matriz[i][j+1] #2
-                #matrizResultante[i][j+1] = aux
-                #print("Matriz Inicial Horizontal: ", matriz)
-                # tentando fazer na mesma matriz
-                #print("Custo Troca", matriz[i][j]+ matriz[i][j+1])
-                aux = matriz[i][j] # 1
+                
+                somaPeso = 2
+                somaPeso = vectorPesos[matriz[i][j] -1 ] + vectorPesos[matriz[i][j+1]-1]
+                aux = matriz[i][j]
                 matriz[i][j] = matriz[i][j+1]
                 matriz[i][j+1] = aux
-                u = espande_Permutacao(matriz, permutations)
-                somaPeso = matriz[i][j] + matriz[i][j+1]
+                
+                u = getIdMatriz(matriz, permutations)
+
                 graph.set_adjacency_list(u,v,somaPeso)
                 aux = matriz[i][j]
                 matriz[i][j] = matriz[i][j+1]
@@ -113,24 +107,19 @@ def create_Graph(permutations, l, c, matrizInicial, matrizFinal):
 
         for i in range(0,l-1):
             for j in range(0,c):
-                aux = matriz[i][j] # 1
-                matriz[i][j] = matriz[i+1][j] #3
+                aux = matriz[i][j]
+                somaPeso = vectorPesos[matriz[i+1][j] -1 ] + vectorPesos[matriz[i][j]-1]
+                matriz[i][j] = matriz[i+1][j]
                 matriz[i+1][j] = aux
-                u = espande_Permutacao(matriz,permutations)
-                somaPeso = matriz[i][j] + matriz[i+1][j]
+                u = getIdMatriz(matriz,permutations)
                 graph.set_adjacency_list(u,v, somaPeso)
                 aux = matriz[i][j]
                 matriz[i][j] = matriz[i+1][j]
                 matriz[i+1][j] = aux  
                 somaPeso = 0
-    
-    returnDistance = calculate_distances(graph.get_graph(), permutations.get(str(matrizInicial)))
-    #print(returnDistance)
-    #print(returnDistance[permutations.get(str(matrizFinal))])
-    #for k, v in graph.get_graph().items():
-    #    print(k, v)
-    #for k,v in permutations.items():
-    #    print(k,v)
+       
+    result = calculate_distances(graph.get_graph(), 1)
+    print(result[idMatrizFinal])
 
 
 def calculate_distances(graph, starting_vertex):
@@ -140,17 +129,10 @@ def calculate_distances(graph, starting_vertex):
     pq = [(0, starting_vertex)]
     while len(pq) > 0:
         current_distance, current_vertex = heapq.heappop(pq)
-
-        # Nodes can get added to the priority queue multiple times. We only
-        # process a vertex the first time we remove it from the priority queue.
         if current_distance > distances[current_vertex]:
             continue
-
         for neighbor, weight in graph[current_vertex].items():
             distance = current_distance + weight
-
-            # Only consider this new path if it's better than any path we've
-            # already found.
             if distance < distances[neighbor]:
                 distances[neighbor] = distance
                 heapq.heappush(pq, (distance, neighbor))
@@ -158,42 +140,24 @@ def calculate_distances(graph, starting_vertex):
     return distances
 
 
-def relax(u, v, w):
-    """ if v.d > u.d + w(u,v)
-        v.d = u.d + w(u,v)
-    """
-    
-def initSingleSource(G,s):
-    """
-        for cada vertice v in V[G]
-            v.d = infinito
-        s = 0
-    """
-def espande_Permutacao(matrizResultante, allpermutations):
-    """ 
-        return key from dict, if matrizResultante is in allpermutations
-    """
-    #print("matriz Trocada", matrizResultante)
-    array_toCheck = []
-    for i in matrizResultante:
-        for j in i:
-            array_toCheck.append(j)
+def getIdMatriz(matrizResultante, allpermutations):
+
+    array_toCheck = [item for sublist in matrizResultante for item in sublist]
+    #print(flat_list)
+    #for i in matrizResultante:
+    #    for j in i:
+    #        array_toCheck.append(j)
     return allpermutations.get(str(array_toCheck))
-
-
+    
 def permutacao(matrizAtual, c=0):
     if c + 1 >= len(matrizAtual):
-        #print("Matriz Atual", matrizAtual, c)
-
         yield matrizAtual
     else:
         for p in permutacao(matrizAtual, c + 1):
-            #print("Matriz Atual", matrizAtual, c)
             yield p
         for i in range(c + 1, len(matrizAtual)):
             matrizAtual[c], matrizAtual[i] = matrizAtual[i], matrizAtual[c]
             for p in permutacao(matrizAtual, c + 1):
-                #print("Matriz Atual", matrizAtual, c)
                 yield p
             matrizAtual[c], matrizAtual[i] = matrizAtual[i], matrizAtual[c]
             	    
