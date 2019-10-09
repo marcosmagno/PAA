@@ -2,7 +2,6 @@ import time
 import sys
 import copy
 import heapq
-import timeit
 """
 Input
     n,m - Dimensão do container
@@ -28,9 +27,10 @@ class Graph(object):
         """
         if v not in self.graph:
             self.graph[v] = {}
+            self.graph[v][u] = w
         else: 
             self.graph[v][u] = w
-        
+            
     def get_graph(self):
         return self.graph
 
@@ -72,33 +72,28 @@ def main():
         dic_permutacao[str(p)] = int(i)
     
     create_Graph(dic_permutacao, int(linhas), int(colunas), matrizInicial, matrizFinal, vectorPesos)
-    end = timeit.timeit()
-    
+
 def create_Graph(permutations, l, c, matrizInicial, matrizFinal, vectorPesos):
     matriz = []
     matrizResultante = []
     graph = Graph()
     idMatrizFinal = permutations.get(str(matrizFinal))
-    
+    #print("Id Matriz", idMatrizFinal)
     for k, v in permutations.items():
-        
-        #n = l
+        #print(k, v)
         r = k.replace("[","")
         r = r.replace("]","")
         resultList = list(map(int, r.split(",")))
         matriz = [resultList[i:i+int(c)] for i in range(0, len(resultList), int(c))]
+        
         for i in range(0,l):
             for j in range(0,c-1):
-                
-                somaPeso = 2
                 somaPeso = vectorPesos[matriz[i][j] -1 ] + vectorPesos[matriz[i][j+1]-1]
                 aux = matriz[i][j]
                 matriz[i][j] = matriz[i][j+1]
                 matriz[i][j+1] = aux
-                
-                u = getIdMatriz(matriz, permutations)
-
-                graph.set_adjacency_list(u,v,somaPeso)
+                #u = getIdMatriz(matriz, permutations)
+                #graph.set_adjacency_list(u,v,somaPeso)
                 aux = matriz[i][j]
                 matriz[i][j] = matriz[i][j+1]
                 matriz[i][j+1] = aux
@@ -111,15 +106,18 @@ def create_Graph(permutations, l, c, matrizInicial, matrizFinal, vectorPesos):
                 somaPeso = vectorPesos[matriz[i+1][j] -1 ] + vectorPesos[matriz[i][j]-1]
                 matriz[i][j] = matriz[i+1][j]
                 matriz[i+1][j] = aux
-                u = getIdMatriz(matriz,permutations)
-                graph.set_adjacency_list(u,v, somaPeso)
+                #u = getIdMatriz(matriz,permutations)
+                #graph.set_adjacency_list(u,v, somaPeso)
                 aux = matriz[i][j]
                 matriz[i][j] = matriz[i+1][j]
                 matriz[i+1][j] = aux  
                 somaPeso = 0
-       
-    result = calculate_distances(graph.get_graph(), 1)
-    print(result[idMatrizFinal])
+    
+
+    #for k, v in graph.get_graph().items():
+    #    print(len(v))
+    #result = calculate_distances(graph.get_graph(), 1)
+    #print(result[idMatrizFinal])
 
 
 def calculate_distances(graph, starting_vertex):
@@ -147,7 +145,9 @@ def getIdMatriz(matrizResultante, allpermutations):
     #for i in matrizResultante:
     #    for j in i:
     #        array_toCheck.append(j)
-    return allpermutations.get(str(array_toCheck))
+    #return allpermutations.get(str(array_toCheck))
+
+    return allpermutations[str(array_toCheck)]
     
 def permutacao(matrizAtual, c=0):
     if c + 1 >= len(matrizAtual):
