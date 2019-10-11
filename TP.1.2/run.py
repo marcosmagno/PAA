@@ -8,7 +8,6 @@ Input
     nm representará o pedo do k-ésimo pacote.
     Tabela 1 - Posição inicial
     Tabela 2 - Posição final
-
 """
 
 """
@@ -51,13 +50,15 @@ def main():
     allPesos = rPeso.split(" ")
     matrizInicial = []
 
-    # leitura do arquivo
+    
     for i in range(2, len(first_line)):
         index = first_line[i].replace("\n","").split(" ")
         
         rIndex = list(map(int, index))
         for j in rIndex:
             matrizInicial.append(j)
+
+
     lenLinhaColuna = int(linhas) * int(colunas)
     vectorPesos = list(map(int, allPesos))
     resultMatrizInicial = list(map(int, matrizInicial))
@@ -65,11 +66,10 @@ def main():
     matrizFinal = resultMatrizInicial[lenLinhaColuna:len(resultMatrizInicial)]
     i = 0
     dic_permutacao = {}
-
-    # Gera todas as permutacoes
     for p in permutacao(matrizInicial):
         i = i + 1
         dic_permutacao[str(p)] = int(i)
+    
     create_Graph(dic_permutacao, int(linhas), int(colunas), matrizInicial, matrizFinal, vectorPesos)
 
 def create_Graph(permutations, l, c, matrizInicial, matrizFinal, vectorPesos):
@@ -77,19 +77,22 @@ def create_Graph(permutations, l, c, matrizInicial, matrizFinal, vectorPesos):
     matrizResultante = []
     graph = Graph()
     idMatrizFinal = permutations.get(str(matrizFinal))
+    #print("Id Matriz", idMatrizFinal)
     for k, v in permutations.items():
+        #print(k, v)
         r = k.replace("[","")
         r = r.replace("]","")
         resultList = list(map(int, r.split(",")))
         matriz = [resultList[i:i+int(c)] for i in range(0, len(resultList), int(c))]
         
-        # Gera novas matrizes a partir da matriz original
         for i in range(0,l):
             for j in range(0,c-1):
                 somaPeso = vectorPesos[matriz[i][j] -1 ] + vectorPesos[matriz[i][j+1]-1]
                 aux = matriz[i][j]
                 matriz[i][j] = matriz[i][j+1]
                 matriz[i][j+1] = aux
+                u = getIdMatriz(matriz, permutations)
+                graph.set_adjacency_list(u,v,somaPeso)
                 aux = matriz[i][j]
                 matriz[i][j] = matriz[i][j+1]
                 matriz[i][j+1] = aux
@@ -102,16 +105,21 @@ def create_Graph(permutations, l, c, matrizInicial, matrizFinal, vectorPesos):
                 somaPeso = vectorPesos[matriz[i+1][j] -1 ] + vectorPesos[matriz[i][j]-1]
                 matriz[i][j] = matriz[i+1][j]
                 matriz[i+1][j] = aux
+                u = getIdMatriz(matriz,permutations)
+                graph.set_adjacency_list(u,v, somaPeso)
                 aux = matriz[i][j]
                 matriz[i][j] = matriz[i+1][j]
                 matriz[i+1][j] = aux  
                 somaPeso = 0
     
 
+    #for k, v in graph.get_graph().items():
+    #    print(len(v))
+    result = calculate_distances(graph.get_graph(), 1)
+    print(result[idMatrizFinal])
+
 
 def calculate_distances(graph, starting_vertex):
-    # Executa algoritimo de Dijkstra
-
     distances = {vertex: float('infinity') for vertex in graph}
     distances[starting_vertex] = 0
 
@@ -130,13 +138,17 @@ def calculate_distances(graph, starting_vertex):
 
 
 def getIdMatriz(matrizResultante, allpermutations):
+
     array_toCheck = [item for sublist in matrizResultante for item in sublist]
+    #print(flat_list)
+    #for i in matrizResultante:
+    #    for j in i:
+    #        array_toCheck.append(j)
+    #return allpermutations.get(str(array_toCheck))
 
     return allpermutations[str(array_toCheck)]
     
 def permutacao(matrizAtual, c=0):
-    # Gera todas as permutacoes possiveis
-    # a partir da matriz inicial
     if c + 1 >= len(matrizAtual):
         yield matrizAtual
     else:
